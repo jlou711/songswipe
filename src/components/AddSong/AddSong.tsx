@@ -1,20 +1,23 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function AddSong(): JSX.Element {
   const [songInput, setSongInput] = useState<string>("");
   const [token, setToken] = useState("");
-  const [tracks, setTracks] = useState([]);
-  console.log(process.env.REACT_APP_CLIENT_ID);
 
-  function getTrackDetails() {
+  useEffect(() => {
+    getSpotifyToken();
+  }, []);
+
+  async function getSpotifyToken() {
     // Api call for retrieving token
-    axios.post("https://accounts.spotify.com/api/token", {
+    const resp = await axios("https://accounts.spotify.com/api/token", {
+      method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization:
           "Basic " +
-          new Buffer(
+          Buffer.from(
             process.env.REACT_APP_CLIENT_ID +
               ":" +
               process.env.REACT_APP_CLIENT_SECRET
@@ -22,6 +25,20 @@ function AddSong(): JSX.Element {
       },
       data: "grant_type=client_credentials",
     });
+    setToken(resp.data.access_token);
+  }
+
+  async function getTrackDetails() {
+    // Api call for retrieving tracks data
+    const resp = await axios(`https://api.spotify.com/v1/tracks/${songInput}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+    console.log(resp.data);
   }
   return (
     <div className="container">
@@ -39,7 +56,7 @@ function AddSong(): JSX.Element {
           className="btn btn-outline-primary"
           type="button"
           id="button-addon2"
-          onClick={() => console.log(songInput)}
+          onClick={() => getTrackDetails()}
         >
           Search
         </button>
