@@ -1,0 +1,28 @@
+body {
+  background: linear-gradient(#1db954, #000);
+  width: 100vw;
+  min-height: 100vh;
+  /* overflow: hidden; */
+}
+
+/* #root > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.app > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  flex-direction: row !important;
+}
+
+.row > * {
+  margin: 5px;
+} */
