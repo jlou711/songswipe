@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 
 function NavBar(): JSX.Element {
   const location = useLocation();
-  console.log(location.pathname);
   return (
     <nav className="navbar navbar-dark bg-dark">
       <div className="container-fluid">
