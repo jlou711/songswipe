@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { IArtist, ITrack } from "../../interfaces/ITrack";
+import { IArtistSpotify, IArtistDB, ITrack } from "../../interfaces/ITrack";
 import AddSongPreview from "../AddSongPreview/AddSongPreview";
 
 function AddSong(): JSX.Element {
-  //const baseURL = process.env.REACT_APP_BASEURL ?? "https://localhost:3000";
-  const [songInput, setSongInput] = useState<string>("3F0mcxksBp33QrL6oyjvLN");
+  const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
+  const [songInput, setSongInput] = useState<string>("04QTmCTsaVjcGaoxj8rSjE");
   const [token, setToken] = useState("");
   const [searchedSong, setSearchedSong] = useState<ITrack>();
 
@@ -33,41 +33,69 @@ function AddSong(): JSX.Element {
 
   async function getTrackDetails() {
     // Api call for retrieving tracks data
-    const resp = await axios(`https://api.spotify.com/v1/tracks/${songInput}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: "Bearer " + token,
-      },
-    });
-    //check response -> try catch
-    console.log(resp.data);
+    const songResp = await axios(
+      `https://api.spotify.com/v1/tracks/${songInput}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
 
-    const artists = resp.data.artists.map((artist: IArtist) => ({
-      name: artist.name,
-      uri: artist.uri,
-    }));
+    // Construct params for GET Several Artists Spotify API
+    const artistList = songResp.data.artists
+      .map((artist: IArtistSpotify) => artist.id)
+      .join("%2C");
+
+    const artistsResp = await axios(
+      `https://api.spotify.com/v1/artists?ids=${artistList}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    const artists: IArtistDB[] = artistsResp.data.artists.map(
+      (artist: IArtistSpotify) => ({
+        artist_name: artist.name,
+        artist_uri: artist.id,
+        genres: artist.genres,
+      })
+    );
+
     setSearchedSong({
-      name: resp.data.name,
+      name: songResp.data.name,
       artists: artists,
-      uri: resp.data.id,
-      album: resp.data.album.name,
-      album_art: resp.data.album.images[1].url,
-      release_date: resp.data.album.release_date,
-      popularity: resp.data.popularity,
+      uri: songResp.data.id,
+      album: songResp.data.album.name,
+      album_art: songResp.data.album.images[1].url,
+      release_date: songResp.data.album.release_date,
+      popularity: songResp.data.popularity,
     });
   }
 
-  // async function addTrackDetails() {
-  //   // Api call for posting new entry into /tracks table
-  //   const resp = await axios.post(baseURL, {
-  //     //data here
-  //   });
-  //   //check response -> try catch
-  //   console.log(resp.data);
-  // }
-
+  async function addTrackDetails() {
+    // Api call for posting new entry into /tracks table
+    console.log(searchedSong);
+    if (searchedSong) {
+      const resp = await axios.post(`${baseURL}/songs`, {
+        uri: searchedSong.uri,
+        name: searchedSong.name,
+        album: searchedSong.album,
+        album_art: searchedSong.album_art,
+        release_date: searchedSong.release_date,
+        artists: searchedSong.artists,
+      });
+      //check response -> try catch
+      console.log(resp.data);
+    }
+  }
   return (
     <div className="container">
       <div className="input-group mb-3">
@@ -88,7 +116,12 @@ function AddSong(): JSX.Element {
         >
           Search
         </button>
-        {searchedSong && <AddSongPreview song={searchedSong} />}
+        {searchedSong && (
+          <AddSongPreview
+            song={searchedSong}
+            addTrackDetails={addTrackDetails}
+          />
+        )}
       </div>
     </div>
   );
