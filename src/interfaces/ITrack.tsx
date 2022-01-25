@@ -10,6 +10,5 @@ export interface ITrack {
 
 export interface IArtist {
   name: string;
-  id: string;
   uri: string;
 }

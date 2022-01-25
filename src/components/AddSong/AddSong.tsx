@@ -4,7 +4,7 @@ import { IArtist, ITrack } from "../../interfaces/ITrack";
 import AddSongPreview from "../AddSongPreview/AddSongPreview";
 
 function AddSong(): JSX.Element {
-  const baseURL = process.env.REACT_APP_BASEURL ?? "https://localhost:3000";
+  //const baseURL = process.env.REACT_APP_BASEURL ?? "https://localhost:3000";
   const [songInput, setSongInput] = useState<string>("3F0mcxksBp33QrL6oyjvLN");
   const [token, setToken] = useState("");
   const [searchedSong, setSearchedSong] = useState<ITrack>();
@@ -46,7 +46,6 @@ function AddSong(): JSX.Element {
 
     const artists = resp.data.artists.map((artist: IArtist) => ({
       name: artist.name,
-      id: artist.id,
       uri: artist.uri,
     }));
     setSearchedSong({
@@ -60,14 +59,14 @@ function AddSong(): JSX.Element {
     });
   }
 
-  async function addTrackDetails() {
-    // Api call for posting new entry into /tracks table
-    const resp = await axios.post(baseURL, {
-      //data here
-    });
-    //check response -> try catch
-    console.log(resp.data);
-  }
+  // async function addTrackDetails() {
+  //   // Api call for posting new entry into /tracks table
+  //   const resp = await axios.post(baseURL, {
+  //     //data here
+  //   });
+  //   //check response -> try catch
+  //   console.log(resp.data);
+  // }
 
   return (
     <div className="container">
