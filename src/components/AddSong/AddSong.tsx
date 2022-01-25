@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { IArtistSpotify, IArtistDB, ITrack } from "../../interfaces/ITrack";
 import AddSongPreview from "../AddSongPreview/AddSongPreview";
+import "./AddSong.css";
 
 function AddSong(): JSX.Element {
   const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
@@ -97,12 +98,12 @@ function AddSong(): JSX.Element {
     }
   }
   return (
-    <div className="container">
+    <div className="container add-song">
       <div className="input-group mb-3">
         <input
           type="text"
           className="form-control"
-          placeholder="Enter a song URI"
+          placeholder="Enter a song URI.."
           aria-label="Song URI"
           aria-describedby="add-song-search-button"
           value={songInput}
@@ -116,13 +117,10 @@ function AddSong(): JSX.Element {
         >
           Search
         </button>
-        {searchedSong && (
-          <AddSongPreview
-            song={searchedSong}
-            addTrackDetails={addTrackDetails}
-          />
-        )}
       </div>
+      {searchedSong && (
+        <AddSongPreview song={searchedSong} addTrackDetails={addTrackDetails} />
+      )}
     </div>
   );
 }

@@ -1,0 +1,25 @@
+.add-song-preview {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  background-color: black;
+  width: fit-content;
+  padding: 0;
+  border-radius: 0.5rem;
+}
+
+.add-song-preview p,
+.add-song-preview h4 {
+  color: azure;
+}
+
+.add-song-preview img {
+  -webkit-box-reflect: below 0px
+    linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1));
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
