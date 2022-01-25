@@ -1,47 +1,21 @@
-import { useState } from "react";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 import TinderCard from "react-tinder-card";
+import { ITrackDB } from "../../interfaces/ITrack";
 import "./TinderContainer.css";
 
-const db = [
-  {
-    name: "Richard Hendricks",
-    url: "https://i.scdn.co/image/ab67616d00001e02cddc25435cb94483d4b7bb45",
-    uri: "5gaUkg5JNk8c4mr2jnpX8H",
-  },
-  {
-    name: "Erlich Bachman",
-    url: "https://i.scdn.co/image/ab67616d00001e02d90a5bdb27e10249bcc39a02",
-    uri: "4N42Ta28mOYeiyMlypgCTK",
-  },
-  {
-    name: "Monica Hall",
-    url: "https://i.scdn.co/image/ab67616d00001e02cddc25435cb94483d4b7bb45",
-    uri: "4rS4K30qVDExdjeU4feF4c",
-  },
-  {
-    name: "Jared Dunn",
-    url: "https://i.scdn.co/image/ab67616d00001e02d90a5bdb27e10249bcc39a02",
-    uri: "7k6phfGndOSCfL4TZRtLft",
-  },
-  {
-    name: "Get Down On It",
-    url: "https://i.scdn.co/image/ab67616d00001e02cddc25435cb94483d4b7bb45",
-    uri: "4yKZACkuudvfd600H2dQie",
-  },
-];
-
-interface SpotifyTrack {
-  name: string;
-  url: string;
-  uri: string;
-}
-
 function TinderContainer(): JSX.Element {
+  const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
   const [lastDirection, setLastDirection] = useState<string>();
-  const [characters, setCharacters] = useState<SpotifyTrack[]>(db);
-  const [currentSong, setCurrentSong] = useState<SpotifyTrack>(
-    characters[characters.length - 1]
-  );
+  const [songList, setSongList] = useState<ITrackDB[]>();
+  const [currentSong, setCurrentSong] = useState<ITrackDB>();
+
+  const getSongList = useCallback(async () => {
+    // Api call for retrieving token
+    const resp = await axios.get(`${baseURL}/songs`);
+    setSongList(resp.data);
+    setCurrentSong(resp.data[resp.data.length - 1]);
+  }, [baseURL]);
 
   const swiped = (direction: string, nameToDelete: string) => {
     console.log("removing: " + nameToDelete);
@@ -50,10 +24,16 @@ function TinderContainer(): JSX.Element {
 
   const outOfFrame = (name: string) => {
     console.log(name + " left the screen!");
-    characters.pop();
-    setCharacters([...characters]);
-    setCurrentSong(characters[characters.length - 1]);
+    if (songList) {
+      songList.pop();
+      setSongList([...songList]);
+      setCurrentSong(songList[songList.length - 1]);
+    }
   };
+
+  useEffect(() => {
+    getSongList();
+  }, [getSongList]);
 
   return (
     <div className="tinder-container">
@@ -67,21 +47,22 @@ function TinderContainer(): JSX.Element {
       />
       <h1>SongSwipe</h1>
       <div className="cardContainer">
-        {characters.map((character) => (
-          <TinderCard
-            className="swipe"
-            key={character.name}
-            onSwipe={(dir) => swiped(dir, character.name)}
-            onCardLeftScreen={() => outOfFrame(character.name)}
-          >
-            <div
-              style={{ backgroundImage: "url(" + character.url + ")" }}
-              className="card"
+        {songList &&
+          songList.map((song) => (
+            <TinderCard
+              className="swipe"
+              key={song.name}
+              onSwipe={(dir) => swiped(dir, song.name)}
+              onCardLeftScreen={() => outOfFrame(song.name)}
             >
-              <h3>{character.name}</h3>
-            </div>
-          </TinderCard>
-        ))}
+              <div
+                style={{ backgroundImage: "url(" + song.album_art + ")" }}
+                className="card"
+              >
+                <h3>{song.name}</h3>
+              </div>
+            </TinderCard>
+          ))}
       </div>
       {lastDirection ? (
         <h2 className="infoText">You swiped {lastDirection}</h2>
