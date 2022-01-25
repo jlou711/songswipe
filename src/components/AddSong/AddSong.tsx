@@ -1,20 +1,26 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { IArtist, ITrack } from "../../interfaces/ITrack";
+import AddSongPreview from "../AddSongPreview/AddSongPreview";
 
 function AddSong(): JSX.Element {
-  const [songInput, setSongInput] = useState<string>("");
+  //const baseURL = process.env.REACT_APP_BASEURL ?? "https://localhost:3000";
+  const [songInput, setSongInput] = useState<string>("3F0mcxksBp33QrL6oyjvLN");
   const [token, setToken] = useState("");
-  const [tracks, setTracks] = useState([]);
-  console.log(process.env.REACT_APP_CLIENT_ID);
+  const [searchedSong, setSearchedSong] = useState<ITrack>();
 
-  function getTrackDetails() {
+  useEffect(() => {
+    getSpotifyToken();
+  }, []);
+  async function getSpotifyToken() {
     // Api call for retrieving token
-    axios.post("https://accounts.spotify.com/api/token", {
+    const resp = await axios("https://accounts.spotify.com/api/token", {
+      method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization:
           "Basic " +
-          new Buffer(
+          Buffer.from(
             process.env.REACT_APP_CLIENT_ID +
               ":" +
               process.env.REACT_APP_CLIENT_SECRET
@@ -22,7 +28,46 @@ function AddSong(): JSX.Element {
       },
       data: "grant_type=client_credentials",
     });
+    setToken(resp.data.access_token);
   }
+
+  async function getTrackDetails() {
+    // Api call for retrieving tracks data
+    const resp = await axios(`https://api.spotify.com/v1/tracks/${songInput}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+    //check response -> try catch
+    console.log(resp.data);
+
+    const artists = resp.data.artists.map((artist: IArtist) => ({
+      name: artist.name,
+      uri: artist.uri,
+    }));
+    setSearchedSong({
+      name: resp.data.name,
+      artists: artists,
+      uri: resp.data.id,
+      album: resp.data.album.name,
+      album_art: resp.data.album.images[1].url,
+      release_date: resp.data.album.release_date,
+      popularity: resp.data.popularity,
+    });
+  }
+
+  // async function addTrackDetails() {
+  //   // Api call for posting new entry into /tracks table
+  //   const resp = await axios.post(baseURL, {
+  //     //data here
+  //   });
+  //   //check response -> try catch
+  //   console.log(resp.data);
+  // }
+
   return (
     <div className="container">
       <div className="input-group mb-3">
@@ -31,18 +76,19 @@ function AddSong(): JSX.Element {
           className="form-control"
           placeholder="Enter a song URI"
           aria-label="Song URI"
-          aria-describedby="button-addon2"
+          aria-describedby="add-song-search-button"
           value={songInput}
           onChange={(e) => setSongInput(e.target.value)}
         />
         <button
-          className="btn btn-outline-primary"
+          className="btn btn-dark"
           type="button"
-          id="button-addon2"
-          onClick={() => console.log(songInput)}
+          id="add-song-search-button"
+          onClick={() => getTrackDetails()}
         >
           Search
         </button>
+        {searchedSong && <AddSongPreview song={searchedSong} />}
       </div>
     </div>
   );
