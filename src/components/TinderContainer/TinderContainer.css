@@ -4,6 +4,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  margin-top: 2rem;
 }
 
 .swipe {
@@ -109,4 +110,14 @@
 
 .tinder-container h2 {
   color: #fff;
+  margin-top: 2rem;
+}
+
+iframe {
+  margin-top: 2rem;
+}
+
+.loading-spinner {
+  margin-top: 2rem;
+  color: white;
 }
