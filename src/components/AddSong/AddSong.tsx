@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 function AddSong(): JSX.Element {
   const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
-  const [songInput, setSongInput] = useState<string>("04QTmCTsaVjcGaoxj8rSjE");
+  const [songInput, setSongInput] = useState<string>("");
   const [token, setToken] = useState("");
   const [searchedSong, setSearchedSong] = useState<ITrack>();
   const [validationErrors, setValidationErrors] = useState(false);
@@ -16,7 +16,6 @@ function AddSong(): JSX.Element {
   const showToastError = (str: string) => {
     toast.error(str);
   };
-
   const showToastSuccess = (str: string) => {
     toast.success(str);
   };
@@ -24,6 +23,7 @@ function AddSong(): JSX.Element {
   useEffect(() => {
     getSpotifyToken();
   }, []);
+
   async function getSpotifyToken() {
     // Api call for retrieving token
     const resp = await axios("https://accounts.spotify.com/api/token", {
@@ -41,6 +41,17 @@ function AddSong(): JSX.Element {
       data: "grant_type=client_credentials",
     });
     setToken(resp.data.access_token);
+  }
+
+  async function getSpotifyArtists(artistList: IArtist[]) {
+    return axios(`https://api.spotify.com/v1/artists?ids=${artistList}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
   }
 
   async function getTrackDetails() {
@@ -66,17 +77,7 @@ function AddSong(): JSX.Element {
           .map((artist: IArtist) => artist.id)
           .join("%2C");
 
-        const artistsResp = await axios(
-          `https://api.spotify.com/v1/artists?ids=${artistList}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: "Bearer " + token,
-            },
-          }
-        );
+        const artistsResp = await getSpotifyArtists(artistList);
         const artists: IArtistDB[] = artistsResp.data.artists.map(
           (artist: IArtist) => ({
             artist_name: artist.name,

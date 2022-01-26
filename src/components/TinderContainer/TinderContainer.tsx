@@ -28,13 +28,11 @@ function TinderContainer(): JSX.Element {
     [baseURL]
   );
 
-  const swiped = (direction: string, nameToDelete: string) => {
-    console.log("removing: " + nameToDelete);
+  const swiped = (direction: string) => {
     setLastDirection(direction);
   };
 
-  const outOfFrame = (name: string) => {
-    console.log(name + " left the screen!");
+  const outOfFrame = () => {
     if (songList) {
       songList.pop();
       setSongList([...songList]);
@@ -61,10 +59,10 @@ function TinderContainer(): JSX.Element {
               className="swipe"
               key={song.uri}
               onSwipe={(dir) => {
-                swiped(dir, song.name);
+                swiped(dir);
                 updateLikes(dir, song.uri);
               }}
-              onCardLeftScreen={() => outOfFrame(song.name)}
+              onCardLeftScreen={() => outOfFrame()}
             >
               <div
                 style={{ backgroundImage: "url(" + song.album_art + ")" }}
