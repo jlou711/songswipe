@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import AddSong from "./components/AddSong/AddSong";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import Popular from "./components/Popular/Popular";
 
 function App(): JSX.Element {
   return (
@@ -14,7 +15,7 @@ function App(): JSX.Element {
       <Routes>
         <Route path="/" element={<TinderContainer />} />
         <Route path="/add-song" element={<AddSong />} />
-        <Route path="/about" element={<h1>About</h1>} />
+        <Route path="/popular" element={<Popular />} />
       </Routes>
     </>
   );

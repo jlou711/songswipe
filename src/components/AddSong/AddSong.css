@@ -23,3 +23,7 @@
   width: 300px;
   margin: -75px 0 0 -100px;
 }
+
+a:link {
+  text-decoration: none;
+}

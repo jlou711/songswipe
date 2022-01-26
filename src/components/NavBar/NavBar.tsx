@@ -41,11 +41,11 @@ function NavBar(): JSX.Element {
             </a>
             <a
               className={`nav-link ${
-                location.pathname === "/about" ? "active" : ""
+                location.pathname === "/popular" ? "active" : ""
               }`}
-              href="about"
+              href="popular"
             >
-              About
+              Popular
             </a>
           </div>
         </div>

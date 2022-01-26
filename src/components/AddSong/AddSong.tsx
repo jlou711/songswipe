@@ -125,7 +125,7 @@ function AddSong(): JSX.Element {
           release_date: searchedSong.release_date,
           artists: searchedSong.artists,
         });
-        if (resp.status === 200) {
+        if (resp.status === 201) {
           showToastSuccess("Your song has been added 🎶");
           setSongInput("");
           setSearchedSong(undefined);
@@ -134,6 +134,7 @@ function AddSong(): JSX.Element {
         }
       }
     } catch (e) {
+      console.log(e);
       if (axios.isAxiosError(e) && e.response) {
         switch (e.response.status) {
           case 409:
@@ -152,7 +153,17 @@ function AddSong(): JSX.Element {
   return (
     <>
       <div className="container add-song">
-        <h3>To add a song, enter a song URI into the input below</h3>
+        <h3>
+          To add a song, enter a{" "}
+          <a
+            href="https://community.spotify.com/t5/FAQs/What-s-a-Spotify-URI/ta-p/919201#:~:text=A%20Spotify%20URI%20(Uniform%20Resource,or%20Artist%20Profile%20on%20Spotify."
+            target="_blank"
+            rel="noreferrer"
+          >
+            song URI
+          </a>{" "}
+          into the input below
+        </h3>
         <div className="input-group">
           <input
             type="text"

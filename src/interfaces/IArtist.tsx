@@ -1,10 +1,14 @@
 export interface IArtist {
   external_urls: { string: string };
-  followers: {};
+  followers: { href: string; total: number };
   genres: Array<string>;
   href: string;
   id: string;
-  images: Array<{}>;
+  images: Array<{
+    url: string;
+    width: number;
+    height: number;
+  }>;
   name: string;
   popularity: number;
   type: string;
