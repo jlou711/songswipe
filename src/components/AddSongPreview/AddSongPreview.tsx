@@ -14,7 +14,7 @@ function AddSongPreview({
 }: IAddSongPreview): JSX.Element {
   return (
     <>
-      <div className="add-song-preview-header">
+      <div className="add-song-preview-header mt-3">
         <h5>Click the tick if this looks right!</h5>
         <FontAwesomeIcon
           icon={faCheckCircle}

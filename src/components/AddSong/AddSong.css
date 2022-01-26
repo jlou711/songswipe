@@ -8,3 +8,18 @@
 .input-group {
   width: 40%;
 }
+
+.uri-validation {
+  color: rgb(199, 4, 4);
+  font-size: 0.875em;
+}
+
+.crop {
+  width: 300px;
+  overflow: hidden;
+}
+
+.crop img {
+  width: 300px;
+  margin: -75px 0 0 -100px;
+}

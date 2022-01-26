@@ -11,6 +11,7 @@ function AddSong(): JSX.Element {
   const [songInput, setSongInput] = useState<string>("04QTmCTsaVjcGaoxj8rSjE");
   const [token, setToken] = useState("");
   const [searchedSong, setSearchedSong] = useState<ITrack>();
+  const [validationErrors, setValidationErrors] = useState(false);
 
   const showToastError = (str: string) => {
     toast.error(str);
@@ -43,54 +44,74 @@ function AddSong(): JSX.Element {
   }
 
   async function getTrackDetails() {
-    // Api call for retrieving tracks data
-    const songResp = await axios(
-      `https://api.spotify.com/v1/tracks/${songInput}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: "Bearer " + token,
-        },
+    //Validation
+    if (songInput.length === 22) {
+      setValidationErrors(false);
+      // Api call for retrieving tracks data
+      try {
+        const songResp = await axios(
+          `https://api.spotify.com/v1/tracks/${songInput}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+
+        // Construct params for GET Several Artists Spotify API
+        const artistList = songResp.data.artists
+          .map((artist: IArtist) => artist.id)
+          .join("%2C");
+
+        const artistsResp = await axios(
+          `https://api.spotify.com/v1/artists?ids=${artistList}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+        const artists: IArtistDB[] = artistsResp.data.artists.map(
+          (artist: IArtist) => ({
+            artist_name: artist.name,
+            artist_uri: artist.id,
+            genres: artist.genres,
+          })
+        );
+
+        setSearchedSong({
+          name: songResp.data.name,
+          artists: artists,
+          uri: songResp.data.id,
+          album: songResp.data.album.name,
+          album_art: songResp.data.album.images[1].url,
+          release_date: songResp.data.album.release_date,
+          popularity: songResp.data.popularity,
+        });
+      } catch (e) {
+        if (axios.isAxiosError(e) && e.response) {
+          switch (e.response.status) {
+            case 400:
+              // Bad URI
+              setValidationErrors(true);
+              setSearchedSong(undefined);
+              break;
+            default:
+              // Server error
+              showToastError("Oops! Something went wrong, please try again!");
+          }
+        }
       }
-    );
-
-    // Construct params for GET Several Artists Spotify API
-    const artistList = songResp.data.artists
-      .map((artist: IArtist) => artist.id)
-      .join("%2C");
-
-    const artistsResp = await axios(
-      `https://api.spotify.com/v1/artists?ids=${artistList}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: "Bearer " + token,
-        },
-      }
-    );
-    const artists: IArtistDB[] = artistsResp.data.artists.map(
-      (artist: IArtist) => ({
-        artist_name: artist.name,
-        artist_uri: artist.id,
-        genres: artist.genres,
-      })
-    );
-
-    setSearchedSong({
-      name: songResp.data.name,
-      artists: artists,
-      uri: songResp.data.id,
-      album: songResp.data.album.name,
-      album_art: songResp.data.album.images[1].url,
-      release_date: songResp.data.album.release_date,
-      popularity: songResp.data.popularity,
-    });
+    } else {
+      setValidationErrors(true);
+    }
   }
-
   async function addTrackDetails() {
     // Api call for posting new entry into /tracks table
     try {
@@ -103,15 +124,18 @@ function AddSong(): JSX.Element {
           release_date: searchedSong.release_date,
           artists: searchedSong.artists,
         });
-        showToastSuccess("Your song has been added 🎶");
-        console.log(resp);
-        setSongInput("");
-        setSearchedSong(undefined);
+        if (resp.status === 200) {
+          showToastSuccess("Your song has been added 🎶");
+          setSongInput("");
+          setSearchedSong(undefined);
+        } else {
+          showToastError("Oops! Something went wrong, please try again!");
+        }
       }
     } catch (e) {
       if (axios.isAxiosError(e) && e.response) {
         switch (e.response.status) {
-          case 400:
+          case 409:
             // Duplicate
             showToastError(
               "Looks like you tried to add a song that already exists!"
@@ -121,8 +145,6 @@ function AddSong(): JSX.Element {
             // Server error
             showToastError("Oops! Something went wrong, please try again!");
         }
-      } else {
-        console.log(e);
       }
     }
   }
@@ -130,7 +152,7 @@ function AddSong(): JSX.Element {
     <>
       <div className="container add-song">
         <h3>To add a song, enter a song URI into the input below</h3>
-        <div className="input-group mb-3">
+        <div className="input-group">
           <input
             type="text"
             className="form-control"
@@ -149,11 +171,22 @@ function AddSong(): JSX.Element {
             Search
           </button>
         </div>
-        {searchedSong && (
+        {validationErrors && (
+          <span className="uri-validation mb-3">
+            Your URI doesn't look quite right..
+          </span>
+        )}
+        {searchedSong && !validationErrors && (
           <AddSongPreview
             song={searchedSong}
             addTrackDetails={addTrackDetails}
           />
+        )}
+        {validationErrors && (
+          <div
+            className="card"
+            style={{ backgroundImage: "url(/blank_album_art.jpeg)" }}
+          ></div>
         )}
       </div>
     </>
