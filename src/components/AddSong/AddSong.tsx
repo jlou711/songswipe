@@ -83,19 +83,18 @@ function AddSong(): JSX.Element {
 
   async function addTrackDetails() {
     // Api call for posting new entry into /tracks table
-    console.log(searchedSong);
-    // if (searchedSong) {
-    //   const resp = await axios.post(`${baseURL}/songs`, {
-    //     uri: searchedSong.uri,
-    //     name: searchedSong.name,
-    //     album: searchedSong.album,
-    //     album_art: searchedSong.album_art,
-    //     release_date: searchedSong.release_date,
-    //     artists: searchedSong.artists,
-    //   });
-    setSongInput("");
-    setSearchedSong(undefined);
-    //}
+    if (searchedSong) {
+      const resp = await axios.post(`${baseURL}/songs`, {
+        uri: searchedSong.uri,
+        name: searchedSong.name,
+        album: searchedSong.album,
+        album_art: searchedSong.album_art,
+        release_date: searchedSong.release_date,
+        artists: searchedSong.artists,
+      });
+      setSongInput("");
+      setSearchedSong(undefined);
+    }
   }
   return (
     <div className="container add-song">
