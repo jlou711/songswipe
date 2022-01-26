@@ -9,16 +9,24 @@ import "./TinderContainer.css";
 function TinderContainer(): JSX.Element {
   const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
   const [lastDirection, setLastDirection] = useState<string>();
-  const [songList, setSongList] = useState<ITrackDB[]>();
+  const [songList, setSongList] = useState<ITrackDB[]>([]);
   const [currentSong, setCurrentSong] = useState<ITrackDB>();
   const [loading, setLoading] = useState(true);
 
   const getSongList = useCallback(async () => {
     // Api call for retrieving token
     const resp = await axios.get(`${baseURL}/songs`);
-    setSongList(resp.data);
-    setCurrentSong(resp.data[resp.data.length - 1]);
+    setSongList(resp.data.data);
+    setCurrentSong(resp.data.data[resp.data.data.length - 1]);
   }, [baseURL]);
+
+  const updateLikes = useCallback(
+    async (dir, uri) => {
+      const option = dir === "right" ? "likes" : "dislikes";
+      await axios.put(`${baseURL}/songs/${uri}/${option}`);
+    },
+    [baseURL]
+  );
 
   const swiped = (direction: string, nameToDelete: string) => {
     console.log("removing: " + nameToDelete);
@@ -45,22 +53,17 @@ function TinderContainer(): JSX.Element {
 
   return (
     <div className="tinder-container">
-      <link
-        href="https://fonts.googleapis.com/css?family=Damion&display=swap"
-        rel="stylesheet"
-      />
-      <link
-        href="https://fonts.googleapis.com/css?family=Alatsi&display=swap"
-        rel="stylesheet"
-      />
       <h1>SongSwipe</h1>
       <div className="cardContainer">
         {songList &&
           songList.map((song) => (
             <TinderCard
               className="swipe"
-              key={song.name}
-              onSwipe={(dir) => swiped(dir, song.name)}
+              key={song.uri}
+              onSwipe={(dir) => {
+                swiped(dir, song.name);
+                updateLikes(dir, song.uri);
+              }}
               onCardLeftScreen={() => outOfFrame(song.name)}
             >
               <div
@@ -71,8 +74,18 @@ function TinderContainer(): JSX.Element {
               </div>
             </TinderCard>
           ))}
+        {songList.length === 0 && (
+          <TinderCard className="swipe">
+            <div
+              style={{ backgroundImage: "url(/blank_album_art.jpeg)" }}
+              className="card"
+            ></div>
+          </TinderCard>
+        )}
       </div>
-      {lastDirection ? (
+      {songList.length === 0 ? (
+        <h2 className="infoText">You've reached the end of the list!</h2>
+      ) : lastDirection ? (
         <h2 className="infoText">You swiped {lastDirection}</h2>
       ) : (
         <h2 className="infoText">Swipe to like or dislike a song</h2>
@@ -94,6 +107,7 @@ function TinderContainer(): JSX.Element {
           frameBorder="0"
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           onLoad={hideSpinner}
+          style={{ display: loading ? "none" : "" }}
         ></iframe>
       ) : (
         <iframe

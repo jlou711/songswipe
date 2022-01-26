@@ -1,4 +1,5 @@
 import { useLocation } from "react-router-dom";
+import "./NavBar.css";
 
 function NavBar(): JSX.Element {
   const location = useLocation();
