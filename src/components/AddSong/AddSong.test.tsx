@@ -23,14 +23,15 @@ it("text to should link to spotify forum", () => {
   );
 });
 
-const entries = [
+const invalidEntries = [
   { uri: "" },
   { uri: "ABCDEFG" },
-  { uri: "spotify:track:37ZJ0p5Jm13JPevGcx4SkF" },
   { uri: "spotify:track:37ZJ0p5Jm13JPevGcx4SkF12345" },
 ];
 
-test.each(entries)(
+const validEntries = [{ uri: "spotify:track:37ZJ0p5Jm13JPevGcx4SkF" }];
+
+test.each(invalidEntries)(
   "check invalid search inputs display error message and valid inputs do not show error",
   async (entry) => {
     render(
@@ -43,15 +44,27 @@ test.each(entries)(
     fireEvent.change(searchInput, { target: { value: entry.uri } });
     fireEvent.click(searchButton);
 
-    const songURI = entry.uri.split(":").pop() ?? "";
-    if (songURI.length === 22) {
-      expect(
-        await screen.queryByText("Your URI doesn't look quite right..")
-      ).not.toBeInTheDocument();
-    } else {
-      expect(
-        await screen.queryByText("Your URI doesn't look quite right..")
-      ).toBeInTheDocument();
-    }
+    expect(
+      screen.queryByText("Your URI doesn't look quite right..")
+    ).toBeInTheDocument();
+  }
+);
+
+test.each(validEntries)(
+  "check valid search inputs do not display error message",
+  async (entry) => {
+    render(
+      <Router>
+        <AddSong />
+      </Router>
+    );
+    const searchInput = screen.getByPlaceholderText("Enter a song URI..");
+    const searchButton = screen.getByText("Search");
+    fireEvent.change(searchInput, { target: { value: entry.uri } });
+    fireEvent.click(searchButton);
+
+    expect(
+      screen.queryByText("Your URI doesn't look quite right..")
+    ).not.toBeInTheDocument();
   }
 );
