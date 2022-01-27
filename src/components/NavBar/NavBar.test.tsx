@@ -13,8 +13,8 @@ it("renders without crashing", () => {
 
 const links = [
   { text: "Home", location: "/" },
-  { text: "Add Song", location: "add-song" },
-  { text: "Popular 🔥", location: "popular" },
+  { text: "Add Song", location: "/add-song" },
+  { text: "Popular 🔥", location: "/popular" },
 ];
 
 it("title should display app name and also link back to home page", () => {

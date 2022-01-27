@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./NavBar.css";
 
 function NavBar(): JSX.Element {
@@ -22,31 +22,30 @@ function NavBar(): JSX.Element {
         </button>
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div className="navbar-nav">
-            <a
+            <Link
+              to="/"
               className={`nav-link ${
                 location.pathname === "/" ? "active" : ""
               }`}
-              aria-current="page"
-              href="/"
             >
               Home
-            </a>
-            <a
+            </Link>
+            <Link
+              to="/add-song"
               className={`nav-link ${
                 location.pathname === "/add-song" ? "active" : ""
               }`}
-              href="add-song"
             >
               Add Song
-            </a>
-            <a
+            </Link>
+            <Link
+              to="/popular"
               className={`nav-link ${
                 location.pathname === "/popular" ? "active" : ""
               }`}
-              href="popular"
             >
               Popular 🔥
-            </a>
+            </Link>
           </div>
         </div>
       </div>
