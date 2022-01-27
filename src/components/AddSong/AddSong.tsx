@@ -55,13 +55,14 @@ function AddSong(): JSX.Element {
   }
 
   async function getTrackDetails() {
+    const songURI = songInput.split(":").pop() ?? "";
     //Validation
-    if (songInput.length === 22) {
+    if (songURI.length === 22) {
       setValidationErrors(false);
       // Api call for retrieving tracks data
       try {
         const songResp = await axios(
-          `https://api.spotify.com/v1/tracks/${songInput}`,
+          `https://api.spotify.com/v1/tracks/${songURI}`,
           {
             method: "GET",
             headers: {
@@ -103,6 +104,11 @@ function AddSong(): JSX.Element {
               setValidationErrors(true);
               setSearchedSong(undefined);
               break;
+            case 404:
+              // Bad URI
+              setValidationErrors(true);
+              setSearchedSong(undefined);
+              break;
             default:
               // Server error
               showToastError("Oops! Something went wrong, please try again!");
@@ -117,7 +123,7 @@ function AddSong(): JSX.Element {
     // Api call for posting new entry into /tracks table
     try {
       if (searchedSong) {
-        const resp = await axios.post(`${baseURL}/songs`, {
+        await axios.post(`${baseURL}/songs`, {
           uri: searchedSong.uri,
           name: searchedSong.name,
           album: searchedSong.album,
@@ -125,16 +131,11 @@ function AddSong(): JSX.Element {
           release_date: searchedSong.release_date,
           artists: searchedSong.artists,
         });
-        if (resp.status === 201) {
-          showToastSuccess("Your song has been added 🎶");
-          setSongInput("");
-          setSearchedSong(undefined);
-        } else {
-          showToastError("Oops! Something went wrong, please try again!");
-        }
+        showToastSuccess("Your song has been added 🎶");
+        setSongInput("");
+        setSearchedSong(undefined);
       }
     } catch (e) {
-      console.log(e);
       if (axios.isAxiosError(e) && e.response) {
         switch (e.response.status) {
           case 409:

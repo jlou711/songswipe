@@ -45,7 +45,7 @@ function NavBar(): JSX.Element {
               }`}
               href="popular"
             >
-              Popular
+              Popular 🔥
             </a>
           </div>
         </div>

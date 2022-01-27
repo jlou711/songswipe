@@ -18,6 +18,7 @@ function AddSongPreview({
         <h5>Click the tick if this looks right!</h5>
         <FontAwesomeIcon
           icon={faCheckCircle}
+          data-testid="check-button"
           className="confirm-song-btn"
           size="lg"
           onClick={addTrackDetails}

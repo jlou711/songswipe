@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import TinderCard from "react-tinder-card";
 import { ITrackDB } from "../../interfaces/ITrack";
 import "./TinderContainer.css";
+import { shuffle } from "../../utils/shuffle";
 
 function TinderContainer(): JSX.Element {
   const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
@@ -16,7 +17,7 @@ function TinderContainer(): JSX.Element {
   const getSongList = useCallback(async () => {
     // Api call for retrieving token
     const resp = await axios.get(`${baseURL}/songs`);
-    setSongList(resp.data.data);
+    setSongList(shuffle(resp.data.data));
     setCurrentSong(resp.data.data[resp.data.data.length - 1]);
   }, [baseURL]);
 

@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
 import { IPopularTrack } from "../../interfaces/ITrack";
-import { capitalize } from "../../utils/capitalize";
 import "./Popular.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRedo } from "@fortawesome/free-solid-svg-icons";
+import PopularTable from "./PopularTable";
 
 function Popular(): JSX.Element {
   const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
@@ -22,7 +22,7 @@ function Popular(): JSX.Element {
   function handleRefresh() {
     setRefreshSpin(true);
     getPopularSongs();
-    setTimeout(() => setRefreshSpin(false), 500);
+    setTimeout(() => setRefreshSpin(false), 1000);
   }
 
   useEffect(() => {
@@ -45,86 +45,9 @@ function Popular(): JSX.Element {
           />
         </button>
       </div>
-      <table className="table table-dark table-hover">
-        <thead>
-          <tr>
-            <th scope="col" style={{ width: "5%" }}>
-              #
-            </th>
-            <th scope="col" style={{ width: "20%" }}>
-              Song name
-            </th>
-            <th scope="col" style={{ width: "20%" }}>
-              Artists
-            </th>
-            <th scope="col" style={{ width: "50%" }}>
-              Genres
-            </th>
-            <th scope="col" style={{ width: "5%" }}>
-              Likes
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {popularSongs.map((song, index) => {
-            return (
-              <tr key={song.uri}>
-                <th scope="row">{index + 1}</th>
-                <td>{song.name}</td>
-                <td>{song.artists}</td>
-                <td>
-                  {song.genres
-                    .split(", ")
-                    .map((genre) => capitalize(genre))
-                    .join(", ")}
-                </td>
-                <td style={{ textAlign: "center" }}>{song.difference}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <PopularTable songs={popularSongs} />
       <h1>Unpopular</h1>
-      <table className="table table-dark table-hover">
-        <thead>
-          <tr>
-            <th scope="col" style={{ width: "5%" }}>
-              #
-            </th>
-            <th scope="col" style={{ width: "20%" }}>
-              Song name
-            </th>
-            <th scope="col" style={{ width: "20%" }}>
-              Artists
-            </th>
-            <th scope="col" style={{ width: "50%" }}>
-              Genres
-            </th>
-            <th scope="col" style={{ width: "5%" }}>
-              Likes
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {unpopularSongs.map((song, index) => {
-            return (
-              <tr key={song.uri}>
-                <th scope="row">{index + 1}</th>
-                <td>{song.name}</td>
-                <td>{song.artists}</td>
-                <td>
-                  {" "}
-                  {song.genres
-                    .split(", ")
-                    .map((genre) => capitalize(genre))
-                    .join(", ")}
-                </td>
-                <td style={{ textAlign: "center" }}>{song.difference}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <PopularTable songs={unpopularSongs} />
     </div>
   );
 }
