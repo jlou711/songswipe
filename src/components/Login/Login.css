@@ -1,0 +1,13 @@
+.logged-in {
+  display: flex;
+  align-items: center;
+  padding-left: 15rem;
+}
+
+.dropdown {
+  margin-left: 1rem;
+}
+
+.spotify-icon {
+  margin-right: 0.5rem;
+}

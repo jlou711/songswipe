@@ -13,8 +13,8 @@ it("renders without crashing", () => {
 
 const links = [
   { text: "Home", location: "/" },
-  { text: "Add Song", location: "add-song" },
-  { text: "Popular 🔥", location: "popular" },
+  { text: "Add Song", location: "/add-song" },
+  { text: "Popular 🔥", location: "/popular" },
 ];
 
 it("title should display app name and also link back to home page", () => {
@@ -25,7 +25,6 @@ it("title should display app name and also link back to home page", () => {
   );
   const title = screen.getByText("SongSwipe");
   expect(title).toHaveTextContent("SongSwipe");
-  expect(title).toHaveAttribute("href", "/");
 });
 
 // I use test.each to iterate the test cases above

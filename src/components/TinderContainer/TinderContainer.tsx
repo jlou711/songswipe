@@ -1,19 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TinderCard from "react-tinder-card";
 import { ITrackDB } from "../../interfaces/ITrack";
 import "./TinderContainer.css";
 import { shuffle } from "../../utils/shuffle";
-import { IPlaylist } from "../../interfaces/IPlaylist";
-import { IUser } from "../../interfaces/IUser";
-import { AppContext } from "../../App";
-
-interface ITinderContainer {
-  user: IUser | undefined;
-  selectedPlaylist: IPlaylist | undefined;
-}
 
 function TinderContainer(): JSX.Element {
   const baseURL = process.env.REACT_APP_BASE_URL ?? "http://localhost:4000";
@@ -21,8 +13,6 @@ function TinderContainer(): JSX.Element {
   const [songList, setSongList] = useState<ITrackDB[]>([]);
   const [currentSong, setCurrentSong] = useState<ITrackDB>();
   const [loading, setLoading] = useState(true);
-  const user = useContext(AppContext);
-  const randomtest = user?.name;
 
   const getSongList = useCallback(async () => {
     const resp = await axios.get(`${baseURL}/songs`);
@@ -30,29 +20,23 @@ function TinderContainer(): JSX.Element {
     setCurrentSong(resp.data.data[resp.data.data.length - 1]);
   }, [baseURL]);
 
-  const addSongToPlaylist = async () => {
-    console.log("lala");
-    console.log(randomtest);
-    console.log(user);
-    if (user) {
-      console.log("Running");
-      // const resp = await axios(
-      //   `https://api.spotify.com/v1/playlists/${selectedPlaylist.id}/tracks`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Accept: "application/json",
-      //       Authorization: "Bearer " + user.token,
-      //       data: JSON.stringify({
-      //         uris: ["spotify:track:6pjJEgCaTLR5DjO7GPRH9N"],
-      //       }),
-      //     },
-      //   }
-      // );
-      // return resp.data.items;
-    }
-  };
+  // const addSongToPlaylist = useCallback(async () => {
+  //   const resp = await axios(
+  //     `https://api.spotify.com/v1/playlists/${id}/tracks`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Accept: "application/json",
+  //         Authorization: "Bearer " + token,
+  //         data: JSON.stringify({
+  //           uris: ["spotify:track:6pjJEgCaTLR5DjO7GPRH9N"],
+  //         }),
+  //       },
+  //     }
+  //   );
+  //   return resp.data.items;
+  // }, []);
 
   const updateLikes = useCallback(
     async (dir, uri) => {
@@ -72,7 +56,6 @@ function TinderContainer(): JSX.Element {
       setSongList([...songList]);
       setCurrentSong(songList[songList.length - 1]);
       setLoading(true);
-      addSongToPlaylist();
     }
   };
 
@@ -97,7 +80,9 @@ function TinderContainer(): JSX.Element {
                 swiped(dir);
                 updateLikes(dir, song.uri);
               }}
-              onCardLeftScreen={() => outOfFrame()}
+              onCardLeftScreen={() => {
+                outOfFrame();
+              }}
             >
               <div
                 style={{ backgroundImage: "url(" + song.album_art + ")" }}
@@ -154,7 +139,6 @@ function TinderContainer(): JSX.Element {
           onLoad={hideSpinner}
         ></iframe>
       )}
-      {user && <h1>Hello</h1>}
     </div>
   );
 }
