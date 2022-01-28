@@ -15,11 +15,28 @@ function TinderContainer(): JSX.Element {
   const [loading, setLoading] = useState(true);
 
   const getSongList = useCallback(async () => {
-    // Api call for retrieving token
     const resp = await axios.get(`${baseURL}/songs`);
     setSongList(shuffle(resp.data.data));
     setCurrentSong(resp.data.data[resp.data.data.length - 1]);
   }, [baseURL]);
+
+  // const addSongToPlaylist = useCallback(async () => {
+  //   const resp = await axios(
+  //     `https://api.spotify.com/v1/playlists/${id}/tracks`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Accept: "application/json",
+  //         Authorization: "Bearer " + token,
+  //         data: JSON.stringify({
+  //           uris: ["spotify:track:6pjJEgCaTLR5DjO7GPRH9N"],
+  //         }),
+  //       },
+  //     }
+  //   );
+  //   return resp.data.items;
+  // }, []);
 
   const updateLikes = useCallback(
     async (dir, uri) => {
@@ -63,7 +80,9 @@ function TinderContainer(): JSX.Element {
                 swiped(dir);
                 updateLikes(dir, song.uri);
               }}
-              onCardLeftScreen={() => outOfFrame()}
+              onCardLeftScreen={() => {
+                outOfFrame();
+              }}
             >
               <div
                 style={{ backgroundImage: "url(" + song.album_art + ")" }}

@@ -1,14 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
+import Login from "../Login/Login";
 import "./NavBar.css";
 
 function NavBar(): JSX.Element {
   const location = useLocation();
+
   return (
     <nav className="navbar navbar-dark bg-dark">
       <div className="container-fluid">
-        <a className="navbar-brand" href="/">
-          SongSwipe
-        </a>
+        <h1 className="navbar-brand">SongSwipe</h1>
+        <Login></Login>
         <button
           className="navbar-toggler"
           type="button"

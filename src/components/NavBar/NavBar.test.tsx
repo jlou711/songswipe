@@ -25,7 +25,6 @@ it("title should display app name and also link back to home page", () => {
   );
   const title = screen.getByText("SongSwipe");
   expect(title).toHaveTextContent("SongSwipe");
-  expect(title).toHaveAttribute("href", "/");
 });
 
 // I use test.each to iterate the test cases above
